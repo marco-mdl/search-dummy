@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Indexing{% endblock %}
+{% block body %}
+    <main class="flex-shrink-0">
+        <div class="container">
+            <form method="post" enctype="multipart/form-data">
+                <div class="border border-dark p-2">
+                    <div class="col d-flex">
+                        <input name="{{ form.files.vars.full_name }}" multiple
+                               class="form-control me-2" type="file">
+                        <button class="btn btn-outline-success" type="submit">Upload</button>
+                        {{ form_widget(form._token) }}
+                    </div>
+                </div>
+            </form>
+            <div>
+                {% if indexingResult %}
+                    {{ indexingResult.indexedDocuments }} Dokumente importiert.
+                    {% if indexingResult.errors %}
+                        <h2>Fehler:</h2>
+                        <pre>{{ indexingResult.errors|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </main>
+{% endblock %}

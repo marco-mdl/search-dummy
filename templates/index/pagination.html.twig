@@ -1,0 +1,18 @@
+{% macro pagination(searchResponse, form) %}
+    {% set pages = (searchResponse.totalCount / searchResponse.size)|ceil %}
+    <div>
+        {{ searchResponse.count }} von {{ searchResponse.totalCount }} Artikel
+    </div>
+    {% if pages > 0 %}
+    <nav>
+        <ul class="pagination">
+            {% for counter in 1..pages %}
+                <li class="page-item {{ searchResponse.page == counter ? 'active' : ''}}">
+                    <button name="{{ form.page.vars.full_name }}"
+                            class="page-link" value="{{ counter }}">{{ counter }}</button>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+{% endmacro %}

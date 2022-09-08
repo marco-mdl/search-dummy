@@ -1,0 +1,16 @@
+{% macro table(searchHitCollection) %}
+    <table class="table">
+        <thead>
+
+        </thead>
+        <tbody>
+        {% for hit in searchHitCollection %}
+            <tr>
+                <td>{{ hit.name }}</td>
+                <td>{{ hit.articleNumber }}</td>
+                {#                    <td>{{ hit.longtext|slice(1, 100) }}</td> #}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

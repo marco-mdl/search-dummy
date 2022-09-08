@@ -1,0 +1,63 @@
+version: '3.7'
+services:
+  proxy:
+    image: traefik:v2.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedByDefault=false"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.docker`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.services.traefik.loadbalancer.server.scheme=http"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  app:
+    build: .
+    container_name: search-dummy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`app.docker`)"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+      - "traefik.http.services.app.loadbalancer.server.scheme=http"
+    environment:
+      - APP_ENV=dev
+    volumes:
+      - '.:/var/www'
+      - './vendor:/var/www/vendor:delegated'
+      - '~/.composer/auth.json:/root/.composer/auth.json:delegated'
+      - 'composer_cache:/root/composer:delegated'
+      - 'phive_cache:/root/.phive:delegated'
+  test-es8:
+    image: lgatica/openssh-client
+    command: "ssh -4 -o StrictHostKeyChecking=no -NL 0.0.0.0:9200:test-es8:9200 -p 8023 root@dck01.elc.ede.bawue.com"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.docker`)"
+      - "traefik.http.services.elasticsearch.loadbalancer.server.port=9200"
+      - "traefik.http.services.elasticsearch.loadbalancer.server.scheme=http"
+    volumes:
+      - "~/.ssh/id_rsa:/root/.ssh/id_rsa:ro"
+    ports:
+      - "9208:9200"
+    profiles: ["tunnels"]
+  test-app:
+    image: lgatica/openssh-client
+    command: "ssh -4 -o StrictHostKeyChecking=no -NL 0.0.0.0:80:test-search-service:80 -p 8023 root@dck01.elc.ede.bawue.com"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.test-stage.rule=Host(`test-app.docker`)"
+      - "traefik.http.services.test-stage.loadbalancer.server.port=80"
+      - "traefik.http.services.test-stage.loadbalancer.server.scheme=http"
+    volumes:
+      - "~/.ssh/id_rsa:/root/.ssh/id_rsa:ro"
+    profiles: ["tunnels"]
+volumes:
+  composer_cache:
+  phive_cache:
