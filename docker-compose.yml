@@ -24,8 +24,6 @@ services:
       - "traefik.http.routers.app.rule=Host(`app.docker`)"
       - "traefik.http.services.app.loadbalancer.server.port=80"
       - "traefik.http.services.app.loadbalancer.server.scheme=http"
-    environment:
-      - APP_ENV=dev
     volumes:
       - '.:/var/www'
       - './vendor:/var/www/vendor:delegated'

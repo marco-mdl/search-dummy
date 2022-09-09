@@ -67,7 +67,6 @@ class IndexController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $indexingResult = $indexingService->indexingFiles($form->getData()['files']);
-            dump($indexingResult);
             } catch (Throwable $exception) {
                 $this
                     ->addFlash(
