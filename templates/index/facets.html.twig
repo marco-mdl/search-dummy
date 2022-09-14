@@ -1,0 +1,50 @@
+{% macro facets(searchResponse, form) %}
+    {% set search = form.vars.data %}
+    <div class="row">
+        {% for facet in searchResponse.facetCollection %}
+            <div class=" col">
+                <select name="search_form[facets][{{ facet.name }}][]"
+                        class="selectpicker" multiple title="{{ facet.name|urlDecode|raw }}">
+                    {% for value,count in facet.values %}
+                        <option value="{{ value }}"
+                                {{ facetIsSubmitted(value, facet.name, search) ? 'selected="selected"' : '' }}
+                        >{{ value|urlDecode|raw }} ({{ count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro manufacturer(searchResponse, form) %}
+    <div class="row">
+        {% if searchResponse.manufacturerCollection|length > 0 %}
+            {% set search = form.vars.data %}
+            <div class=" col">
+                <select name="search_form[manufacturer][]"
+                        class="selectpicker" multiple title="Hersteller">
+                    {% for manufacturer in searchResponse.manufacturerCollection %}
+                        <option value="{{ manufacturer.name }}"
+                                {{ manufacturerIsSubmitted(manufacturer.name, search) ? 'selected="selected"' : '' }}
+                        >{{ manufacturer.name|urlDecode|raw }} ({{ manufacturer.count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro productGroups(searchResponse, form) %}
+    <div class="row">
+        {% for productGroup in searchResponse.productGroupCollection %}
+            <div class="col">
+                <button name="{{ form.productGroup.vars.full_name }}"
+                        class="page-link" value="{{ productGroup.id }}">
+                    {{ productGroup.name }} ({{ productGroup.count }})
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}

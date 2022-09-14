@@ -12,6 +12,7 @@ class FormExtension extends AbstractExtension
     {
         return [
             new TwigFunction('facetIsSubmitted', [$this, 'facetIsSubmitted']),
+            new TwigFunction('manufacturerIsSubmitted', [$this, 'manufacturerIsSubmitted']),
         ];
     }
 
@@ -23,5 +24,10 @@ class FormExtension extends AbstractExtension
         }
 
         return false;
+    }
+
+    public function manufacturerIsSubmitted(mixed $value, Search $search): bool
+    {
+        return $search->getManufacturer() && in_array($value, $search->getManufacturer());
     }
 }

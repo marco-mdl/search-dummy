@@ -12,6 +12,7 @@ class SearchResult
         private readonly SearchHitCollection    $searchHitCollection,
         private readonly FacetCollection        $facetCollection,
         private readonly ProductGroupCollection $productGroupCollection,
+        private readonly ManufacturerCollection $manufacturerCollection,
     )
     {
     }
@@ -49,5 +50,10 @@ class SearchResult
     public function getProductGroupCollection(): ProductGroupCollection
     {
         return $this->productGroupCollection;
+    }
+
+    public function getManufacturerCollection(): ManufacturerCollection
+    {
+        return $this->manufacturerCollection;
     }
 }

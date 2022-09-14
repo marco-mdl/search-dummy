@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\ValueObject\Facet;
 use App\ValueObject\FacetCollection;
+use App\ValueObject\Manufacturer;
+use App\ValueObject\ManufacturerCollection;
 use App\ValueObject\ProductGroup;
 use App\ValueObject\ProductGroupCollection;
 use App\ValueObject\SearchHit;
@@ -34,6 +36,7 @@ class ResultMapper
         }
         $facetCollection = new FacetCollection();
         $productGroupCollection = new ProductGroupCollection();
+        $manufacturerCollection = new ManufacturerCollection();
         foreach ($response['facets'] as $name => $facets) {
             if ($name === 'warengruppen') {
                 foreach ($facets as $id => $group) {
@@ -48,6 +51,19 @@ class ResultMapper
                 }
                 continue;
             }
+            if ($name === 'manufacturer') {
+                foreach ($facets as $manufacturerName => $count) {
+                    $manufacturerCollection
+                        ->add(
+                            new Manufacturer(
+                                count: $count,
+                                name: $manufacturerName
+                            )
+                        );
+                }
+                continue;
+            }
+
             $facetCollection
                 ->add(
                     new Facet(
@@ -64,7 +80,8 @@ class ResultMapper
             totalCount: $response['total_count'],
             searchHitCollection: $hitCollection,
             facetCollection: $facetCollection,
-            productGroupCollection: $productGroupCollection
+            productGroupCollection: $productGroupCollection,
+            manufacturerCollection: $manufacturerCollection
         );
     }
 }

@@ -7,9 +7,8 @@ use App\Form\IndexingForm;
 use App\Form\SearchForm;
 use App\Service\IndexingService;
 use App\Service\SearchService;
+use App\Service\SuggestService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -35,6 +34,7 @@ class IndexController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $search->setFacets($request->get('search_form')['facets'] ?? []);
+                $search->setManufacturer($request->get('search_form')['manufacturer'] ?? []);
                 $searchResponse = $searchService->search($search);
 
 
@@ -56,9 +56,25 @@ class IndexController extends AbstractController
         );
     }
 
+    #[Route('/suggest', name: 'suggest')]
+    public function suggest(Request $request, SuggestService $suggestService): Response
+    {
+        try {
+            $response = $suggestService->suggest($request->get('q'));
+
+        } catch (Throwable $exception) {
+            $response =
+                [
+                    'error' => $exception->getMessage()
+                ];
+        } finally {
+            return $this->json($response);
+        }
+    }
+
     #[Route('/indexing', name: 'indexing')]
     public function indexing(
-        Request $request,
+        Request         $request,
         IndexingService $indexingService
     ): Response
     {

@@ -3,6 +3,7 @@
 {% block title %}Search Dummy{% endblock %}
 {% import "index/hitsTable.html.twig" as hitsTable %}
 {% import "index/pagination.html.twig" as pagination %}
+{% import "index/facets.html.twig" as facets %}
 {% block body %}
     <main class="flex-shrink-0">
         <div class="container">
@@ -19,6 +20,7 @@
                     <div class="row">
                         <div class="col d-flex">
                             <input name="{{ form.term.vars.full_name }}" value="{{ form.term.vars.value }}"
+                                   id="searchTerm"
                                    class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                             <button class="btn btn-outline-success" type="submit">Search</button>
                             {{ form_widget(form._token) }}
@@ -26,31 +28,9 @@
                     </div>
 
                     {% if searchResponse %}
-                        <div class="row">
-                            {% for productGroup in searchResponse.productGroupCollection %}
-                                <div class="col">
-                                    <button name="{{ form.productGroup.vars.full_name }}"
-                                            class="page-link" value="{{ productGroup.id }}">
-                                        {{ productGroup.name }} ({{ productGroup.count }})
-                                    </button>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <div class="row">
-                            {% for facet in searchResponse.facetCollection %}
-                                <div class=" col">
-                                    <select name="search_form[facets][{{ facet.name }}][]"
-                                            class="selectpicker" multiple title="{{ facet.name|urlDecode|raw }}">
-                                        {% for value,count in facet.values %}
-                                            <option value="{{ value }}"
-                                                    {{ facetIsSubmitted(value, facet.name, search) ? 'selected="selected"' : '' }}
-                                            >{{ value|urlDecode|raw }} ({{ count }})
-                                            </option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            {% endfor %}
-                        </div>
+                        {{ facets.productGroups(searchResponse, form) }}
+                        {{ facets.manufacturer(searchResponse, form) }}
+                        {{ facets.facets(searchResponse, form) }}
                     {% endif %}
                 </div>
                 {% if searchResponse %}
@@ -60,4 +40,14 @@
             </form>
         </div>
     </main>
+    <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
+    <script>
+        $(function () {
+            $("#searchTerm").autoComplete({
+                resolverSettings: {
+                    url: '{{ path('suggest') }}'
+                }
+            });
+        });
+    </script>
 {% endblock %}

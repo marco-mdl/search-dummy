@@ -14,6 +14,7 @@ class Search
     private ?string $productGroup = null;
 
     private ?array $facets = [];
+    private ?array $manufacturer = [];
 
     public function getExcludedAssortments(): ?string
     {
@@ -81,5 +82,15 @@ class Search
     public function setProductGroup(?string $productGroup): void
     {
         $this->productGroup = $productGroup;
+    }
+
+    public function getManufacturer(): ?array
+    {
+        return $this->manufacturer;
+    }
+
+    public function setManufacturer(?array $manufacturer): void
+    {
+        $this->manufacturer = $manufacturer;
     }
 }

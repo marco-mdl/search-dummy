@@ -38,6 +38,9 @@ class SearchService
         if (empty($search->getProductGroup()) === false) {
             $query['warengruppe'] = $search->getProductGroup();
         }
+        if (empty($search->getManufacturer()) === false) {
+            $query['manufacturers'] = implode(',', $search->getManufacturer());
+        }
         $response = $this
             ->searchServiceClient
             ->request(
