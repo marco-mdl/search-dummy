@@ -13,12 +13,12 @@ class IndexingService
     {
     }
 
-    public function indexingFiles(iterable $files): IndexingResult
+    public function indexingFiles(iterable $files, string $index): IndexingResult
     {
         $indexingResult = new IndexingResult();
         foreach ($files as $file) {
             try {
-                $result = $this->indexingFile($file);
+                $result = $this->indexingFile($file, $index);
                 $this
                     ->handleResponse($result, $indexingResult);
             } catch (Exception $exception) {
@@ -29,8 +29,9 @@ class IndexingService
         return $indexingResult;
     }
 
-    private function handleResponse(array $response, IndexingResult $indexingResult): void{
-        if($response['errors'] === false){
+    private function handleResponse(array $response, IndexingResult $indexingResult): void
+    {
+        if ($response['errors'] === false) {
             $indexingResult
                 ->addIndexedDocuments(count($response['items']));
 
@@ -38,10 +39,10 @@ class IndexingService
         }
 
         $indexedDocuments = 0;
-        foreach ($response['items'] as $item){
-            if(isset($item['index']['error'])){
+        foreach ($response['items'] as $item) {
+            if (isset($item['index']['error'])) {
                 $indexingResult->addError($item['index']);
-            }else{
+            } else {
                 $indexedDocuments++;
             }
         }
@@ -51,10 +52,10 @@ class IndexingService
 
     }
 
-    private function indexingFile(SplFileInfo $file): array
+    private function indexingFile(SplFileInfo $file, string $index): array
     {
         $content = file_get_contents($file->getRealPath());
-        $content = str_replace('"_index":"test"', '"_index":"test2"', $content);
+        $content = str_replace('"_index":"test"', '"_index":"' . $index . '"', $content);
         $content = json_decode($content, true);
 
         $content = $content['body'];
@@ -62,14 +63,18 @@ class IndexingService
         $i = 0;
         foreach ($content as $row) {
             $i++;
-            $data .= json_encode($row). "\n";
+            if(isset($row['index']['_index'])){
+                $row['index']['_index'] = $index;
+            }
+            $data .= json_encode($row) . "\n";
         }
 
         return $this
             ->postDocuments($data);
     }
 
-    private function postDocuments(string $documents): array{
+    private function postDocuments(string $documents): array
+    {
         $response = $this
             ->elasticClient
             ->request(

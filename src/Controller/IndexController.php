@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Indexing;
 use App\Entity\Search;
 use App\Form\IndexingForm;
 use App\Form\SearchForm;
@@ -78,11 +79,12 @@ class IndexController extends AbstractController
         IndexingService $indexingService
     ): Response
     {
-        $form = $this->createForm(IndexingForm::class);
+        $indexing = new Indexing();
+        $form = $this->createForm(IndexingForm::class, $indexing);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $indexingResult = $indexingService->indexingFiles($form->getData()['files']);
+                $indexingResult = $indexingService->indexingFiles($indexing->getFiles(), $indexing->getIndex());
             } catch (Throwable $exception) {
                 $this
                     ->addFlash(

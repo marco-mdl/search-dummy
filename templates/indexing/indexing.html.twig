@@ -6,6 +6,7 @@
         <div class="container">
             <form method="post" enctype="multipart/form-data">
                 <div class="border border-dark p-2">
+                    {{ form_row(form.index) }}
                     <div class="col d-flex">
                         <input name="{{ form.files.vars.full_name }}" multiple
                                class="form-control me-2" type="file">
