@@ -20,7 +20,7 @@
                     <div class="row">
                         <div class="col d-flex">
                             <input name="{{ form.term.vars.full_name }}" value="{{ form.term.vars.value }}"
-                                   id="searchTerm"
+                                   id="searchTerm" autocomplete="off"
                                    class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                             <button class="btn btn-outline-success" type="submit">Search</button>
                             {{ form_widget(form._token) }}
